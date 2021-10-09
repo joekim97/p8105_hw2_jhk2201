@@ -57,3 +57,85 @@ totalprecipitation2018_2019 =
 ```
 
 Make sure to write the paragraph here.
+
+### Problem 2:
+
+``` r
+pols_month = 
+  read_csv("./data/pols-month.csv") %>%
+  janitor::clean_names() %>%
+  separate(mon, c("year","month","day"), "-") %>%
+  mutate(month = as.integer(month), year = as.integer(year)) %>%
+  mutate(month = month.name[month]) %>%
+  mutate(president = ifelse(prez_gop == 0,"dem","gop")) %>%
+  select(-prez_dem, -prez_gop, -day)
+```
+
+    ## Rows: 822 Columns: 9
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl  (8): prez_gop, gov_gop, sen_gop, rep_gop, prez_dem, gov_dem, sen_dem, r...
+    ## date (1): mon
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+snp_df = 
+  read_csv("./data/snp.csv") %>%
+  janitor::clean_names() %>%
+  separate(date, c("year","month", "day"), "/") %>%
+  mutate(month = as.integer(month), year = as.integer(year)) %>%
+  mutate(month = month.name[month], year= year + 2000) %>%
+  arrange(year, month)
+```
+
+    ## Rows: 787 Columns: 2
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (1): date
+    ## dbl (1): close
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+unemployment_df = 
+  read_csv("./data/unemployment.csv") %>%
+  pivot_longer(
+    2:13,
+    names_to = "month",
+    values_to = "unemployment_level"
+  ) %>%
+  mutate(month = match(month, month.abb)) %>%
+  mutate(month = month.name[month]) %>%
+  janitor::clean_names() %>%
+  arrange(year,month) %>% 
+  mutate(year = as.integer(year))
+```
+
+    ## Rows: 68 Columns: 13
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## dbl (13): Year, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+snp_pols_merge = 
+  left_join(snp_df, pols_month, by=c("year", "month"))
+
+complete_merge = 
+  left_join(snp_pols_merge, unemployment_df, by=c("year", "month"))
+```
+
+Write a short paragraph about these datasets. Explain briefly what each
+dataset contained, and describe the resulting dataset (e.g. give the
+dimension, range of years, and names of key variables).
