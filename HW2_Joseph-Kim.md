@@ -22,6 +22,7 @@ library(tidyverse)
 
 ``` r
 library(readxl)
+library(dplyr)
 ```
 
 ## Read in Excel (Import dataset and datacleaning)
@@ -139,3 +140,24 @@ complete_merge =
 Write a short paragraph about these datasets. Explain briefly what each
 dataset contained, and describe the resulting dataset (e.g. give the
 dimension, range of years, and names of key variables).
+
+``` r
+babyname_data =  
+  read_csv("./data/Popular_Baby_Names.csv") %>%
+  janitor::clean_names() %>%
+  mutate(ethnicity = ifelse(ethnicity=="ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER", ethnicity)) %>%
+  mutate(ethnicity = ifelse(ethnicity=="WHITE NON HISP", "WHITE NON HISPANIC", ethnicity)) %>%
+  mutate(ethnicity = ifelse(ethnicity=="BLACK NON HISP", "BLACK NON HISPANIC", ethnicity)) %>%
+  distinct()
+```
+
+    ## Rows: 19418 Columns: 6
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): Gender, Ethnicity, Child's First Name
+    ## dbl (3): Year of Birth, Count, Rank
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
