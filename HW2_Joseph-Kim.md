@@ -161,3 +161,60 @@ babyname_data =
     ## 
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+Oliviatrend_data =  
+  read_csv("./data/Popular_Baby_Names.csv") %>%
+  janitor::clean_names() %>%
+  filter(childs_first_name=="Olivia") %>% 
+  arrange(year_of_birth, ethnicity) %>% 
+  select(-gender, -count) %>%
+  mutate(ethnicity = ifelse(ethnicity=="ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER", ethnicity)) %>%
+  mutate(ethnicity = ifelse(ethnicity=="WHITE NON HISP", "WHITE NON HISPANIC", ethnicity)) %>%
+  mutate(ethnicity = ifelse(ethnicity=="BLACK NON HISP", "BLACK NON HISPANIC", ethnicity)) %>%
+  distinct() %>%
+pivot_wider(
+    names_from = "year_of_birth",
+    values_from = "rank"
+    ) 
+```
+
+    ## Rows: 19418 Columns: 6
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): Gender, Ethnicity, Child's First Name
+    ## dbl (3): Year of Birth, Count, Rank
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+malename_data =  
+  read_csv("./data/Popular_Baby_Names.csv") %>%
+  janitor::clean_names() %>%
+  filter(gender == "MALE") %>% 
+  select(-gender, -count) %>%
+  mutate(ethnicity = ifelse(ethnicity=="ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER", ethnicity)) %>%
+  mutate(ethnicity = ifelse(ethnicity=="WHITE NON HISP", "WHITE NON HISPANIC", ethnicity)) %>%
+  mutate(ethnicity = ifelse(ethnicity=="BLACK NON HISP", "BLACK NON HISPANIC", ethnicity)) %>%
+  distinct() %>%
+  arrange(year_of_birth) %>% 
+  filter(rank == "1") %>%
+pivot_wider(
+    names_from = "year_of_birth",
+    values_from = "childs_first_name"
+    ) 
+```
+
+    ## Rows: 19418 Columns: 6
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (3): Gender, Ethnicity, Child's First Name
+    ## dbl (3): Year of Birth, Count, Rank
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
