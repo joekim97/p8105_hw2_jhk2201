@@ -5,7 +5,7 @@ date: "10/9/2021"
 output: github_document
 ---
 
-##### Homework 2: Data Wrangling 
+# Homework 2: Data Wrangling 
 
 ```{r setup}
 library(tidyverse)
@@ -13,9 +13,11 @@ library(readxl)
 library(dplyr)
 ```
 
-## Read in Excel (Import dataset and datacleaning)
+## Problem 1
 
-```{r}
+### Read in Excel (Import dataset and datacleaning)
+
+```{r, message=FALSE}
 
 trashwheel_df=
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "Mr. Trash Wheel", range="A2:N535") %>%   
@@ -25,8 +27,9 @@ trashwheel_df=
 
 ```
 
+### Cleaning Precipitation Data from 2018 and 2019 
 
-```{r}
+```{r, message=FALSE}
 
 precipitation2018= 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "2018 Precipitation", range = "A2:B14") %>% 
@@ -36,8 +39,7 @@ precipitation2018=
   
 ```
 
-
-```{r}
+```{r, message=FALSE}
 precipitation2019= 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "2019 Precipitation", range = "A2:B14") %>% 
   janitor::clean_names() %>%
@@ -45,6 +47,7 @@ precipitation2019=
   mutate(year="2019") 
 ```
 
+### Combinging Precipitation Databsets
 
 ```{r}
 totalprecipitation2018_2019 = 
@@ -52,12 +55,23 @@ totalprecipitation2018_2019 =
   mutate(month = month.name[month])
 ```
 
-Make sure to write the paragraph here.
+```{r, message=FALSE}
 
+sum(precipitation2018$total)
 
-### Problem 2: 
+median(trashwheel_df$sports_balls)
 
-```{r}
+```
+
+The Trash wheel dataset was large and complex intially. Once cleaned, there were 453 rows and 14 variables. The sum of precipitation in 2018 was 70.33 inches. The median of sports balls from the Trash wheel dataset was 9. 
+
+When I began, the data in the 2018 and 2019 precipitation datasets were simply the numbers for the months of the year with precipitation levels for the corresponding month. The variable "year" was added to specific which year the row fell in. Once the datasets were combined, the month values were changed to their actual names, combined, and arranged by month and year. The combined dataset had 24 rows x 3 columns. 
+
+----------
+
+## Problem 2: 
+
+```{r, message=FALSE}
 pols_month = 
   read_csv("./data/pols-month.csv") %>%
   janitor::clean_names() %>%
@@ -95,10 +109,14 @@ complete_merge =
   left_join(snp_pols_merge, unemployment_df, by=c("year", "month"))
   
 ```
-Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
 
+The three datasets given were simplier than the trash wheel dataset. The pols_month had 822 rows x 9 columns. The snp_df had 787 rows x 4 columns. The Unemployment_df had 816 rows x 3 variables. Onces merged together, the complete_merge had 787 rows and 12 columns. The years ranged from 2001 to 2012. Some of the key variables were the unemployment rate on a given day, the party of the sitting president, and close value for the snp. 
 
-```{r}
+## Problem 3:
+
+### Tidying Initial Baby Name Dataset
+
+```{r, message=FALSE}
 babyname_data =  
   read_csv("./data/Popular_Baby_Names.csv") %>%
   janitor::clean_names() %>%
@@ -106,6 +124,11 @@ babyname_data =
   mutate(ethnicity = ifelse(ethnicity=="WHITE NON HISP", "WHITE NON HISPANIC", ethnicity)) %>%
   mutate(ethnicity = ifelse(ethnicity=="BLACK NON HISP", "BLACK NON HISPANIC", ethnicity)) %>%
   distinct()
+```
+
+### Creating Olivia Dataframe
+
+```{r, message=FALSE}
 
 Oliviatrend_data =  
   read_csv("./data/Popular_Baby_Names.csv") %>%
@@ -125,7 +148,9 @@ pivot_wider(
 ```
 
 
-```{r}
+### Creating Male Name Dataframe:
+
+```{r, message=FALSE}
 
 malename_data =  
   read_csv("./data/Popular_Baby_Names.csv") %>%
@@ -144,7 +169,15 @@ pivot_wider(
     ) 
 ```
 
+### Creating Scatterplot 
 
-  
+```{r, message=FALSE}
+scatterplot_male_df=
+ filter(
+  babyname_data, gender == "MALE", ethnicity == "WHITE NON HISPANIC",year_of_birth == "2016") %>%
+  select(childs_first_name,rank, count)
 
+ggplot(scatterplot_male_df, aes(x=rank, y=count)) + geom_point()
 
+ggsave("baby_name_scatterplot.png")
+```

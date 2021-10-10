@@ -3,7 +3,7 @@ p8105\_HW\_Joseph Kim
 joseph Kim
 10/9/2021
 
-##### Homework 2: Data Wrangling
+# Homework 2: Data Wrangling
 
 ``` r
 library(tidyverse)
@@ -25,7 +25,9 @@ library(readxl)
 library(dplyr)
 ```
 
-## Read in Excel (Import dataset and datacleaning)
+## Problem 1
+
+### Read in Excel (Import dataset and datacleaning)
 
 ``` r
 trashwheel_df=
@@ -34,6 +36,8 @@ trashwheel_df=
   na.omit(dumpster) %>% 
   mutate(sports_balls=round(sports_balls,0)) 
 ```
+
+### Cleaning Precipitation Data from 2018 and 2019
 
 ``` r
 precipitation2018= 
@@ -51,15 +55,41 @@ precipitation2019=
   mutate(year="2019") 
 ```
 
+### Combinging Precipitation Databsets
+
 ``` r
 totalprecipitation2018_2019 = 
   rbind(precipitation2018, precipitation2019) %>%
   mutate(month = month.name[month])
 ```
 
-Make sure to write the paragraph here.
+``` r
+sum(precipitation2018$total)
+```
 
-### Problem 2:
+    ## [1] 70.33
+
+``` r
+median(trashwheel_df$sports_balls)
+```
+
+    ## [1] 9
+
+The Trash wheel dataset was large and complex intially. Once cleaned,
+there were 453 rows and 14 variables. The sum of precipitation in 2018
+was 70.33 inches. The median of sports balls from the Trash wheel
+dataset was 9.
+
+When I began, the data in the 2018 and 2019 precipitation datasets were
+simply the numbers for the months of the year with precipitation levels
+for the corresponding month. The variable “year” was added to specific
+which year the row fell in. Once the datasets were combined, the month
+values were changed to their actual names, combined, and arranged by
+month and year. The combined dataset had 24 rows x 3 columns.
+
+------------------------------------------------------------------------
+
+## Problem 2:
 
 ``` r
 pols_month = 
@@ -70,20 +100,7 @@ pols_month =
   mutate(month = month.name[month]) %>%
   mutate(president = ifelse(prez_gop == 0,"dem","gop")) %>%
   select(-prez_dem, -prez_gop, -day)
-```
 
-    ## Rows: 822 Columns: 9
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## dbl  (8): prez_gop, gov_gop, sen_gop, rep_gop, prez_dem, gov_dem, sen_dem, r...
-    ## date (1): mon
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 snp_df = 
   read_csv("./data/snp.csv") %>%
   janitor::clean_names() %>%
@@ -91,20 +108,7 @@ snp_df =
   mutate(month = as.integer(month), year = as.integer(year)) %>%
   mutate(month = month.name[month], year= year + 2000) %>%
   arrange(year, month)
-```
 
-    ## Rows: 787 Columns: 2
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (1): date
-    ## dbl (1): close
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 unemployment_df = 
   read_csv("./data/unemployment.csv") %>%
   pivot_longer(
@@ -117,19 +121,7 @@ unemployment_df =
   janitor::clean_names() %>%
   arrange(year,month) %>% 
   mutate(year = as.integer(year))
-```
 
-    ## Rows: 68 Columns: 13
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## dbl (13): Year, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 snp_pols_merge = 
   left_join(snp_df, pols_month, by=c("year", "month"))
 
@@ -137,9 +129,17 @@ complete_merge =
   left_join(snp_pols_merge, unemployment_df, by=c("year", "month"))
 ```
 
-Write a short paragraph about these datasets. Explain briefly what each
-dataset contained, and describe the resulting dataset (e.g. give the
-dimension, range of years, and names of key variables).
+The three datasets given were simplier than the trash wheel dataset. The
+pols\_month had 822 rows x 9 columns. The snp\_df had 787 rows x 4
+columns. The Unemployment\_df had 816 rows x 3 variables. Onces merged
+together, the complete\_merge had 787 rows and 12 columns. The years
+ranged from 2001 to 2012. Some of the key variables were the
+unemployment rate on a given day, the party of the sitting president,
+and close value for the snp.
+
+## Problem 3:
+
+### Tidying Initial Baby Name Dataset
 
 ``` r
 babyname_data =  
@@ -151,16 +151,7 @@ babyname_data =
   distinct()
 ```
 
-    ## Rows: 19418 Columns: 6
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (3): Gender, Ethnicity, Child's First Name
-    ## dbl (3): Year of Birth, Count, Rank
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+### Creating Olivia Dataframe
 
 ``` r
 Oliviatrend_data =  
@@ -179,16 +170,7 @@ pivot_wider(
     ) 
 ```
 
-    ## Rows: 19418 Columns: 6
-
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (3): Gender, Ethnicity, Child's First Name
-    ## dbl (3): Year of Birth, Count, Rank
-
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+### Creating Male Name Dataframe:
 
 ``` r
 malename_data =  
@@ -208,13 +190,19 @@ pivot_wider(
     ) 
 ```
 
-    ## Rows: 19418 Columns: 6
+### Creating Scatterplot
 
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (3): Gender, Ethnicity, Child's First Name
-    ## dbl (3): Year of Birth, Count, Rank
+``` r
+scatterplot_male_df=
+ filter(
+  babyname_data, gender == "MALE", ethnicity == "WHITE NON HISPANIC",year_of_birth == "2016") %>%
+  select(childs_first_name,rank, count)
 
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+ggplot(scatterplot_male_df, aes(x=rank, y=count)) + geom_point()
+```
+
+![](HW2_Joseph-Kim_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+ggsave("baby_name_scatterplot.png")
+```
